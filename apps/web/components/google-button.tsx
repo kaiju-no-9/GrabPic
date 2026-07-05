@@ -7,11 +7,11 @@ export function GoogleButton() {
     <a
       href={`${API_URL}/api/auth/google`}
       className={cn(
-        "inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-md border border-zinc-200 bg-white px-8 py-2.5 text-sm font-medium shadow-sm transition-colors hover:bg-zinc-100",
-        "h-10 w-full",
+        "inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-[--radius-md] border border-[--color-hairline-strong] bg-[--color-surface-card] text-[--color-ink] px-8 py-2.5 text-[14px] font-medium transition-colors hover:border-[--color-ink]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-primary]/40",
+        "h-10 w-full"
       )}
     >
-      <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" aria-hidden="true">
         <path
           d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
           fill="#4285F4"

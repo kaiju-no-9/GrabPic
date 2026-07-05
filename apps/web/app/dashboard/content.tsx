@@ -9,11 +9,13 @@ import { JoinEventDialog } from "@/components/join-event-dialog";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { getMyEvents, getEvent, type EventMembership } from "@/api/events";
+import { useToast } from "@/components/ui/toast";
 
 export function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading } = useAuth();
+  const { toast } = useToast();
   const [memberships, setMemberships] = useState<EventMembership[]>([]);
   const [photoCounts, setPhotoCounts] = useState<Record<string, number>>({});
   const [fetching, setFetching] = useState(true);
@@ -32,7 +34,7 @@ export function DashboardContent() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.replace("/");
+      router.replace("/signin");
     }
   }, [user, loading, router]);
 
@@ -53,10 +55,12 @@ export function DashboardContent() {
         }),
       );
       setPhotoCounts(counts);
+    } catch {
+      toast("Failed to load events", "error");
     } finally {
       setFetching(false);
     }
-  }, [user]);
+  }, [user, toast]);
 
   useEffect(() => {
     fetchEvents();
@@ -64,55 +68,80 @@ export function DashboardContent() {
 
   if (loading || !user) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-zinc-400">Loading...</p>
+      <div className="flex min-h-screen items-center justify-center bg-[--color-canvas]">
+        <p className="text-[--color-muted] animate-pulse-soft font-mono text-xs">Loading...</p>
       </div>
     );
   }
 
   const handleLogout = async () => {
-    const { logout } = await import("@/api/auth");
-    await logout();
-    router.replace("/");
+    try {
+      const { logout } = await import("@/api/auth");
+      await logout();
+      toast("Signed out successfully", "success");
+      router.replace("/signin");
+    } catch {
+      toast("Logout failed", "error");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <Navbar showCreateEvent showJoinEvent showSettings />
-      <main className="mx-auto max-w-3xl px-4 py-8">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-zinc-900">Your Events</h1>
-            <p className="mt-1 text-sm text-zinc-500">Welcome, {user.name}</p>
+    <div className="min-h-screen bg-[--color-canvas] text-[--color-body]">
+      <Navbar showSettings />
+      <main className="mx-auto max-w-4xl px-6 py-20 animate-fade-in">
+        <div className="mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 border-b border-[--color-hairline] pb-8">
+          <div className="space-y-2">
+            <h1 className="text-display-md font-sans font-normal text-[--color-ink]">
+              Your Events
+            </h1>
+            <p className="text-sm text-[--color-muted]">
+              Logged in as <span className="font-mono text-[--color-ink]">{user.email}</span>
+            </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => setShowJoin(true)}>
+          <div className="flex items-center gap-3">
+            <Button variant="secondary" size="sm" onClick={() => setShowJoin(true)}>
               Join Event
             </Button>
-            <Button size="sm" onClick={() => setShowCreate(true)}>
+            <Button variant="primary" size="sm" onClick={() => setShowCreate(true)}>
               Create Event
             </Button>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-xs hover:text-[--color-error]">
               Sign out
             </Button>
           </div>
         </div>
 
         {fetching ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 animate-pulse rounded-xl bg-zinc-200" />
+              <div key={i} className="h-[92px] animate-shimmer rounded-[--radius-lg] border border-[--color-hairline]" />
             ))}
           </div>
         ) : memberships.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <p className="text-zinc-500">You haven&apos;t joined any events yet.</p>
-            <p className="mt-1 text-sm text-zinc-400">
-              Create one or ask someone for their event code.
+          <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-[--color-hairline-strong] rounded-[--radius-lg] bg-[--color-surface-card] p-8 max-w-xl mx-auto animate-scale-in">
+            <div className="h-12 w-12 rounded-full bg-[--color-canvas-soft] border border-[--color-hairline] flex items-center justify-center text-[--color-muted] mb-4">
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+              </svg>
+            </div>
+            <h3 className="text-title-sm text-[--color-ink] font-sans font-medium mb-1">
+              No active event decks
+            </h3>
+            <p className="text-sm text-[--color-muted] max-w-sm mb-6">
+              Create a new photo collection deck or enter a 6-character access code from an organizer to get started.
             </p>
+            <div className="flex gap-3 justify-center">
+              <Button variant="secondary" size="sm" onClick={() => setShowJoin(true)}>
+                Join Event
+              </Button>
+              <Button variant="primary" size="sm" onClick={() => setShowCreate(true)}>
+                Create Event
+              </Button>
+            </div>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-slide-up">
             {memberships.map((m) => (
               <EventCard
                 key={m.eventId}
@@ -128,12 +157,18 @@ export function DashboardContent() {
       <CreateEventDialog
         open={showCreate}
         onClose={() => setShowCreate(false)}
-        onCreated={(eventId) => router.push(`/events/${eventId}`)}
+        onCreated={(eventId) => {
+          toast("Event created successfully", "success");
+          router.push(`/events/${eventId}`);
+        }}
       />
       <JoinEventDialog
         open={showJoin}
         onClose={() => setShowJoin(false)}
-        onJoined={(eventId) => router.push(`/events/${eventId}`)}
+        onJoined={(eventId) => {
+          toast("Joined event successfully", "success");
+          router.push(`/events/${eventId}`);
+        }}
       />
     </div>
   );

@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Dialog, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { getSignedUrl, confirmPhotos } from "@/api/events";
+import { useToast } from "@/components/ui/toast";
 
 interface UploadPhotosModalProps {
   open: boolean;
@@ -19,6 +20,7 @@ interface UploadedFile {
 }
 
 export function UploadPhotosModal({ open, onClose, eventId }: UploadPhotosModalProps) {
+  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -52,7 +54,7 @@ export function UploadPhotosModal({ open, onClose, eventId }: UploadPhotosModalP
 
         const resp = await fetch(
           `https://api.cloudinary.com/v1_1/${signed.cloudName}/image/upload`,
-          { method: "POST", body: formData },
+          { method: "POST", body: formData }
         );
 
         if (!resp.ok) {
@@ -70,8 +72,10 @@ export function UploadPhotosModal({ open, onClose, eventId }: UploadPhotosModalP
       }
 
       setUploaded(results);
+      toast("Photos uploaded to cloud. Please confirm to finalize.", "success");
     } catch (e: any) {
-      alert(e.message || "Upload failed");
+      const msg = e.message || "Upload failed";
+      toast(msg, "error");
     } finally {
       setUploading(false);
     }
@@ -83,6 +87,9 @@ export function UploadPhotosModal({ open, onClose, eventId }: UploadPhotosModalP
     try {
       await confirmPhotos(eventId, uploaded);
       setDone(true);
+      toast("Photos registered successfully!", "success");
+    } catch {
+      toast("Confirmation failed.", "error");
     } finally {
       setConfirming(false);
     }
@@ -104,35 +111,44 @@ export function UploadPhotosModal({ open, onClose, eventId }: UploadPhotosModalP
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogHeader>
-        <DialogTitle>{done ? "Upload Complete" : "Upload Photos"}</DialogTitle>
+        <DialogTitle>{done ? "Complete" : "Upload Photos"}</DialogTitle>
+        <DialogDescription>
+          {done ? "Embedding extraction is now queued in background" : "Add event photos to the collection."}
+        </DialogDescription>
       </DialogHeader>
 
       {done ? (
-        <div className="py-4 text-center">
-          <p className="text-green-600 font-medium">
-            {uploaded.length} {uploaded.length === 1 ? "photo" : "photos"} uploaded successfully!
+        <div className="py-6 text-center space-y-4 animate-scale-in">
+          <div className="inline-flex items-center justify-center p-3 rounded-full bg-[--color-success]/10 text-[--color-success] border border-[--color-success]/20">
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <p className="text-sm text-[--color-body] max-w-xs mx-auto">
+            {uploaded.length} {uploaded.length === 1 ? "photo" : "photos"} saved. The AI face scanning service is processing embeddings in the background.
           </p>
-          <p className="mt-1 text-sm text-zinc-500">Face embeddings are being generated.</p>
-          <DialogFooter>
-            <Button onClick={handleClose}>Done</Button>
+          <DialogFooter className="pt-2">
+            <Button variant="default" onClick={handleClose} className="w-full">
+              Done
+            </Button>
           </DialogFooter>
         </div>
       ) : uploaded.length > 0 ? (
-        <div className="space-y-4">
-          <p className="text-sm text-zinc-600">
-            {uploaded.length} {uploaded.length === 1 ? "file" : "files"} uploaded. Confirm to save?
+        <div className="space-y-4 py-4 animate-scale-in">
+          <p className="text-sm text-[--color-body] text-center bg-[--color-canvas-soft] border border-[--color-hairline] p-4 rounded-[--radius-md]">
+            Ready to index <span className="font-mono font-semibold text-[--color-ink]">{uploaded.length}</span> {uploaded.length === 1 ? "photo" : "photos"}.
           </p>
           <DialogFooter>
-            <Button variant="outline" onClick={handleClose}>
+            <Button variant="secondary" onClick={handleClose}>
               Cancel
             </Button>
-            <Button onClick={handleConfirm} disabled={confirming}>
-              {confirming ? "Confirming..." : "Confirm"}
+            <Button variant="primary" onClick={handleConfirm} disabled={confirming}>
+              {confirming ? "Processing..." : "Confirm & Save"}
             </Button>
           </DialogFooter>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4 py-2 animate-scale-in">
           <input
             ref={fileInputRef}
             type="file"
@@ -144,56 +160,58 @@ export function UploadPhotosModal({ open, onClose, eventId }: UploadPhotosModalP
           {files.length === 0 ? (
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex w-full cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-zinc-300 px-6 py-10 text-sm text-zinc-500 hover:border-zinc-400 hover:text-zinc-600 transition-colors"
+              className="flex w-full cursor-pointer flex-col items-center gap-2 rounded-[--radius-lg] border border-dashed border-[--color-hairline-strong] bg-[--color-canvas-soft] hover:border-[--color-primary] px-6 py-12 text-sm text-[--color-body] hover:text-[--color-ink] transition-all duration-200"
             >
-              <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <span>Click to select photos</span>
-              <span className="text-xs text-zinc-400">Multiple files allowed</span>
+              <div className="p-3 rounded-full bg-[--color-surface-card] border border-[--color-hairline] mb-1">
+                <svg className="h-6 w-6 text-[--color-muted]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span className="font-sans font-medium text-[--color-ink]">Select event photos</span>
+              <span className="text-xs text-[--color-muted] font-mono">Multiple selection supported</span>
             </button>
           ) : (
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-zinc-700">
-                {files.length} {files.length === 1 ? "file" : "files"} selected
-              </p>
-              <div className="max-h-40 space-y-1 overflow-y-auto">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center text-xs uppercase tracking-wider text-[--color-muted] font-mono font-semibold">
+                <span>{files.length} selected</span>
+                <button onClick={() => setFiles([])} className="text-[--color-error] hover:underline cursor-pointer">
+                  Clear
+                </button>
+              </div>
+              <div className="max-h-40 overflow-y-auto space-y-1.5 border border-[--color-hairline] rounded-[--radius-md] p-2 bg-[--color-canvas-soft] font-mono text-xs">
                 {files.map((f, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm text-zinc-500">
-                    <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span className="truncate">{f.name}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="ml-auto h-6 w-6 p-0"
+                  <div key={i} className="flex items-center gap-2 text-[--color-body] py-1 px-1.5 rounded-[--radius-xs] hover:bg-black/5">
+                    <span className="truncate flex-1">{f.name}</span>
+                    <button
+                      className="text-[--color-muted] hover:text-[--color-error] transition-colors cursor-pointer"
                       onClick={() => setFiles(files.filter((_, j) => j !== i))}
                     >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </Button>
+                      Remove
+                    </button>
                   </div>
                 ))}
               </div>
-              <div className="flex gap-2 pt-2">
-                <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
-                  Add more
-                </Button>
-                <Button size="sm" onClick={() => setFiles([])}>
-                  Clear
-                </Button>
-              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="w-full text-xs h-9 bg-white"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Add more files
+              </Button>
             </div>
           )}
 
-          <DialogFooter>
-            <Button variant="outline" onClick={handleClose} disabled={uploading}>
+          <DialogFooter className="pt-2">
+            <Button variant="secondary" onClick={handleClose} disabled={uploading}>
               Cancel
             </Button>
-            <Button onClick={handleUpload} disabled={files.length === 0 || uploading}>
-              {uploading ? "Uploading..." : `Upload to Cloudinary`}
+            <Button
+              variant="primary"
+              onClick={handleUpload}
+              disabled={files.length === 0 || uploading}
+            >
+              {uploading ? "Uploading..." : "Start Upload"}
             </Button>
           </DialogFooter>
         </div>

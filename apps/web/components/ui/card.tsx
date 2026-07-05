@@ -1,50 +1,70 @@
+"use client";
+
 import type { HTMLAttributes } from "react";
-import { cn } from "@/lib/utils";
+import { styled } from "styletron-react";
 
-function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn(
-        "rounded-xl border border-zinc-200 bg-white text-zinc-950 shadow",
-        className,
-      )}
-      {...props}
-    />
-  );
+const StyledCard = styled("div", ({ $theme }: any) => ({
+  borderRadius: $theme.borders.cardBorderRadius || "12px",
+  border: `1px solid ${$theme.colors.borderOpaque || "#e6e5e0"}`,
+  backgroundColor: $theme.colors.backgroundTertiary || "#ffffff",
+  color: $theme.colors.contentPrimary || "#26251e",
+  fontFamily: $theme.typography.font100?.fontFamily || "Inter, sans-serif",
+}));
+
+const StyledCardHeader = styled("div", {
+  display: "flex",
+  flexDirection: "column",
+  gap: "6px",
+  padding: "24px",
+});
+
+const StyledCardTitle = styled("h3", ({ $theme }: any) => ({
+  fontSize: "18px",
+  fontWeight: "600",
+  lineHeight: "1.4",
+  margin: 0,
+  color: $theme.colors.contentPrimary || "#26251e",
+}));
+
+const StyledCardDescription = styled("p", ({ $theme }: any) => ({
+  fontSize: "14px",
+  lineHeight: "1.5",
+  margin: 0,
+  color: $theme.colors.contentSecondary || "#5a5852",
+}));
+
+const StyledCardContent = styled("div", {
+  padding: "24px",
+  paddingTop: 0,
+});
+
+const StyledCardFooter = styled("div", {
+  display: "flex",
+  alignItems: "center",
+  padding: "24px",
+  paddingTop: 0,
+});
+
+export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <StyledCard {...props} />;
 }
 
-function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div className={cn("flex flex-col space-y-1.5 p-6", className)} {...props} />
-  );
+export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <StyledCardHeader {...props} />;
 }
 
-function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {
-  return (
-    <h3
-      className={cn("font-semibold leading-none tracking-tight", className)}
-      {...props}
-    />
-  );
+export function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {
+  return <StyledCardTitle {...props} />;
 }
 
-function CardDescription({
-  className,
-  ...props
-}: HTMLAttributes<HTMLParagraphElement>) {
-  return (
-    <p className={cn("text-sm text-zinc-500", className)} {...props} />
-  );
+export function CardDescription({ className, ...props }: HTMLAttributes<HTMLParagraphElement>) {
+  return <StyledCardDescription {...props} />;
 }
 
-function CardContent({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("p-6 pt-0", className)} {...props} />;
+export function CardContent({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <StyledCardContent {...props} />;
 }
 
-function CardFooter({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div className={cn("flex items-center p-6 pt-0", className)} {...props} />
-  );
+export function CardFooter({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <StyledCardFooter {...props} />;
 }
-
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };

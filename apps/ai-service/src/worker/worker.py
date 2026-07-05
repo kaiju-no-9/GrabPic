@@ -30,7 +30,7 @@ async def start_worker():
         logger.info("REDIS_URL not set, worker disabled")
         return
 
-    r: aioredis.Redis = aioredis.from_url(settings.redis_url)
+    r: aioredis.Redis = aioredis.from_url(settings.redis_url, socket_timeout=10.0)
 
     try:
         await r.xgroup_create(STREAM_KEY, GROUP_NAME, id="0", mkstream=True)

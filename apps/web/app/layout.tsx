@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import { AuthProvider } from "@/lib/auth-context";
+import { ToastProvider } from "@/components/ui/toast";
+import { StyletronProviderWrapper } from "@/lib/styletron-provider";
 import "./globals.css";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-});
 
 export const metadata: Metadata = {
   title: "GrabPic",
-  description: "Grab your pictures",
+  description: "Find your face in the crowd — AI-powered photo recognition for events",
 };
 
 export default function RootLayout({
@@ -20,8 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} font-sans antialiased`}>
-        <AuthProvider>{children}</AuthProvider>
+      <body className="font-sans antialiased">
+        <StyletronProviderWrapper>
+          <AuthProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </AuthProvider>
+        </StyletronProviderWrapper>
       </body>
     </html>
   );

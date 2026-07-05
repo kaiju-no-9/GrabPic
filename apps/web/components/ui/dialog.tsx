@@ -1,70 +1,108 @@
 "use client";
 
-import { useRef, type ReactNode, type MouseEvent } from "react";
-import { cn } from "@/lib/utils";
+import { type ReactNode } from "react";
+import { Modal, ROLE } from "baseui/modal";
+import { styled } from "styletron-react";
 
 interface DialogProps {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
-  className?: string;
+  className?: string; // Kept for compatibility
 }
 
-export function Dialog({ open, onClose, children, className }: DialogProps) {
-  const overlayRef = useRef<HTMLDivElement>(null);
-
-  if (!open) return null;
-
-  const handleOverlayClick = (e: MouseEvent) => {
-    if (e.target === overlayRef.current) onClose();
-  };
-
+export function Dialog({ open, onClose, children }: DialogProps) {
   return (
-    <div
-      ref={overlayRef}
-      onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+    <Modal
+      isOpen={open}
+      onClose={onClose}
+      closeable
+      role={ROLE.dialog}
+      animate
+      overrides={{
+        Root: {
+          style: {
+            zIndex: 1000,
+          }
+        },
+        Dialog: {
+          style: ({ $theme }: any) => ({
+            backgroundColor: "#ffffff", // Surface card
+            border: `1px solid ${$theme.colors.borderOpaque || "#e6e5e0"}`, // Hairline border
+            borderRadius: "12px", // {rounded.lg} is 12px
+            padding: "24px",
+            maxWidth: "448px",
+            width: "100%",
+            boxShadow: "none", // Hairline-only depth, no drop shadows
+          })
+        },
+        DialogContainer: {
+          style: {
+            backgroundColor: "rgba(38, 37, 30, 0.15)", // bg-[--color-ink]/15
+            backdropFilter: "blur(4px)",
+          }
+        },
+        Close: {
+          style: {
+            top: "16px",
+            right: "16px",
+            color: "#807d72",
+            ":hover": {
+              color: "#26251e",
+              backgroundColor: "transparent",
+            }
+          }
+        }
+      }}
     >
-      <div
-        className={cn(
-          "w-full max-w-md rounded-xl border border-zinc-200 bg-white p-6 shadow-lg",
-          className,
-        )}
-      >
-        {children}
-      </div>
-    </div>
+      {children}
+    </Modal>
   );
 }
+
+const StyledDialogHeader = styled("div", {
+  marginBottom: "20px",
+  display: "flex",
+  flexDirection: "column",
+  gap: "4px",
+});
 
 export function DialogHeader({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <div className={cn("mb-4 space-y-1", className)}>
-      {children}
-    </div>
-  );
+  return <StyledDialogHeader className={className}>{children}</StyledDialogHeader>;
 }
+
+const StyledTitle = styled("h2", ({ $theme }: any) => ({
+  fontSize: "22px", // {typography.display-sm} is 22px
+  fontWeight: "400", // Display weight stays at 400. Magazine voice.
+  lineHeight: "1.3",
+  letterSpacing: "-0.11px",
+  margin: 0,
+  color: $theme.colors.contentPrimary || "#26251e",
+}));
 
 export function DialogTitle({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <h2 className={cn("text-lg font-semibold text-zinc-900", className)}>
-      {children}
-    </h2>
-  );
+  return <StyledTitle className={className}>{children}</StyledTitle>;
 }
+
+const StyledDescription = styled("p", ({ $theme }: any) => ({
+  fontSize: "14px",
+  lineHeight: "1.5",
+  margin: 0,
+  color: $theme.colors.contentTertiary || "#807d72",
+}));
 
 export function DialogDescription({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <p className={cn("text-sm text-zinc-500", className)}>
-      {children}
-    </p>
-  );
+  return <StyledDescription className={className}>{children}</StyledDescription>;
 }
 
+const StyledFooter = styled("div", {
+  marginTop: "24px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  gap: "12px",
+});
+
 export function DialogFooter({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <div className={cn("mt-6 flex items-center justify-end gap-3", className)}>
-      {children}
-    </div>
-  );
+  return <StyledFooter className={className}>{children}</StyledFooter>;
 }
