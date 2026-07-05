@@ -1,119 +1,60 @@
 "use client";
 
 import { forwardRef, type ButtonHTMLAttributes } from "react";
-import { Button as BaseButton, KIND, SIZE, SHAPE } from "baseui/button";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
-export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "size"> {
-  variant?: "default" | "primary" | "secondary" | "outline" | "ghost" | "destructive";
-  size?: "default" | "sm" | "lg" | "icon";
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-[14px] font-medium transition-colors duration-200 cursor-pointer disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
+  {
+    variants: {
+      variant: {
+        default: "bg-ink text-canvas hover:bg-ink/90",
+        primary: "bg-primary text-on-primary hover:bg-primary-active active:bg-primary-active",
+        secondary:
+          "bg-surface-card text-ink border border-hairline-strong hover:border-ink hover:bg-canvas-soft active:bg-surface-strong",
+        outline:
+          "bg-transparent text-body border border-hairline hover:bg-surface-card hover:text-ink hover:border-hairline-strong",
+        ghost: "bg-transparent text-body hover:bg-surface-strong hover:text-ink",
+        destructive:
+          "bg-transparent text-error border border-error/20 hover:bg-error/5",
+      },
+      size: {
+        default: "h-10 px-[18px]",
+        sm: "h-8 px-3",
+        lg: "h-11 px-5",
+        icon: "h-10 w-10 p-0",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+);
+
+export interface ButtonProps
+  extends ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
   isLoading?: boolean;
-  asChild?: boolean; // Kept for compatibility, though we render BaseButton directly
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ children, variant = "default", size = "default", isLoading, onClick, disabled, className, ...props }, ref) => {
-    // Map variant to Base Web KIND
-    let kind: typeof KIND[keyof typeof KIND] = KIND.primary;
-    if (variant === "secondary" || variant === "outline") {
-      kind = KIND.secondary;
-    } else if (variant === "ghost") {
-      kind = KIND.tertiary;
-    } else if (variant === "destructive") {
-      kind = KIND.secondary;
-    }
-
-    // Map size to Base Web SIZE
-    let baseSize: typeof SIZE[keyof typeof SIZE] = SIZE.default;
-    if (size === "sm") {
-      baseSize = SIZE.compact;
-    } else if (size === "lg") {
-      baseSize = SIZE.large;
-    }
-
-    // Map shape for icon button
-    const shape = size === "icon" ? SHAPE.square : SHAPE.default;
-
-    // Apply custom overrides based on degin.md
-    const overrides = {
-      BaseButton: {
-        style: () => {
-          const styles: any = {
-            borderRadius: "8px", // {rounded.md} is 8px
-            fontFamily: "Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-            fontWeight: "500",
-            fontSize: "14px",
-            height: size === "icon" || size === "default" ? "40px" : size === "sm" ? "32px" : "44px",
-            width: size === "icon" ? "40px" : "auto",
-            paddingLeft: size === "icon" ? "0" : size === "sm" ? "12px" : "18px",
-            paddingRight: size === "icon" ? "0" : size === "sm" ? "12px" : "18px",
-            transition: "all 0.2s ease-in-out",
-            cursor: "pointer",
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
-          };
-
-          if (variant === "primary") {
-            // Cursor Orange (#f54e00)
-            styles.backgroundColor = "#f54e00";
-            styles.color = "#ffffff";
-            styles.border = "none";
-            styles[":hover"] = { backgroundColor: "#d04200" };
-            styles[":active"] = { backgroundColor: "#d04200" };
-          } else if (variant === "secondary") {
-            // White card pill on cream canvas (#ffffff, border hairline strong #cfcdc4)
-            styles.backgroundColor = "#ffffff";
-            styles.color = "#26251e";
-            styles.border = "1px solid #cfcdc4";
-            styles[":hover"] = { borderColor: "#26251e", backgroundColor: "#fafaf7" };
-            styles[":active"] = { backgroundColor: "#e6e5e0" };
-          } else if (variant === "outline") {
-            // Border hairline #e6e5e0
-            styles.backgroundColor = "transparent";
-            styles.color = "#5a5852";
-            styles.border = "1px solid #e6e5e0";
-            styles[":hover"] = { backgroundColor: "#ffffff", color: "#26251e", borderColor: "#cfcdc4" };
-          } else if (variant === "ghost") {
-            styles.backgroundColor = "transparent";
-            styles.color = "#5a5852";
-            styles.border = "none";
-            styles[":hover"] = { backgroundColor: "#e6e5e0", color: "#26251e" };
-          } else if (variant === "destructive") {
-            styles.backgroundColor = "transparent";
-            styles.color = "#cf2d56";
-            styles.border = "1px solid rgba(207, 45, 86, 0.2)";
-            styles[":hover"] = { backgroundColor: "rgba(207, 45, 86, 0.05)" };
-          } else {
-            // Default: "bg-[--color-ink] text-[--color-canvas] hover:bg-[--color-ink]/90"
-            // Ink: #26251e, Canvas: #f7f7f4
-            styles.backgroundColor = "#26251e";
-            styles.color = "#f7f7f4";
-            styles.border = "none";
-            styles[":hover"] = { backgroundColor: "rgba(38, 37, 30, 0.9)" };
-          }
-
-          return styles;
-        }
-      }
-    };
-
+  ({ className, variant, size, isLoading, children, disabled, ...props }, ref) => {
     return (
-      <BaseButton
+      <button
         ref={ref}
-        kind={kind}
-        size={baseSize}
-        shape={shape}
-        isLoading={isLoading}
-        disabled={disabled}
-        onClick={onClick}
-        overrides={overrides}
-        {...(props as any)}
+        className={cn(buttonVariants({ variant, size }), className)}
+        disabled={disabled || isLoading}
+        {...props}
       >
+        {isLoading && (
+          <span className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+        )}
         {children}
-      </BaseButton>
+      </button>
     );
-  }
+  },
 );
 
 Button.displayName = "Button";

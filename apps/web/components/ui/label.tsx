@@ -1,25 +1,16 @@
-"use client";
-
 import type { LabelHTMLAttributes } from "react";
-import { styled } from "styletron-react";
-
-const StyledLabel = styled("label", ({ $theme }: any) => ({
-  fontSize: "14px",
-  fontWeight: "500",
-  lineHeight: "1.4",
-  color: $theme.colors.contentPrimary || "#26251e",
-  fontFamily: $theme.typography.font100?.fontFamily || "Inter, sans-serif",
-  userSelect: "none",
-  cursor: "default",
-  display: "inline-block",
-  marginBottom: "6px",
-  ":disabled": {
-    cursor: "not-allowed",
-    opacity: 0.7,
-  }
-}));
+import { cn } from "@/lib/utils";
 
 export function Label({ className, ...props }: LabelHTMLAttributes<HTMLLabelElement>) {
-  return <StyledLabel {...props} />;
+  return (
+    <label
+      className={cn(
+        "inline-block select-none text-sm font-medium leading-[1.4] text-ink",
+        className,
+      )}
+      {...props}
+    />
+  );
 }
+
 Label.displayName = "Label";

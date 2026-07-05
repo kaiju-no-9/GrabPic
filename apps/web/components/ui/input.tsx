@@ -1,58 +1,22 @@
-"use client";
-
 import { forwardRef, type InputHTMLAttributes } from "react";
-import { Input as BaseInput } from "baseui/input";
+import { cn } from "@/lib/utils";
 
-export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "onChange"> {
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
+export type InputProps = InputHTMLAttributes<HTMLInputElement>;
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, onChange, type = "text", value, ...props }, ref) => {
+  ({ className, type = "text", ...props }, ref) => {
     return (
-      <BaseInput
+      <input
+        ref={ref}
         type={type}
-        value={value}
-        onChange={onChange}
-        inputRef={ref as any}
-        overrides={{
-          Root: {
-            style: ({ $isFocused }: any) => ({
-              borderRadius: "8px", // {rounded.md}
-              borderWidth: "1px",
-              borderStyle: "solid",
-              borderColor: $isFocused ? "#cfcdc4" : "#e6e5e0", // hairline strong / hairline
-              backgroundColor: "#ffffff", // surface card
-              height: "44px", // {spacing.height} 44px
-              fontFamily: "Inter, system-ui, sans-serif",
-              fontSize: "14px",
-              boxShadow: $isFocused ? "0 0 0 2px rgba(245, 78, 0, 0.1)" : "none", // 10% Cursor Orange focus
-              transition: "border-color 0.2s, box-shadow 0.2s",
-              ":hover": {
-                borderColor: $isFocused ? "#cfcdc4" : "#cfcdc4", // hairline strong
-              }
-            })
-          },
-          InputContainer: {
-            style: {
-              backgroundColor: "transparent",
-            }
-          },
-          Input: {
-            style: {
-              paddingLeft: "16px",
-              paddingRight: "16px",
-              color: "#26251e",
-              backgroundColor: "transparent",
-              "::placeholder": {
-                color: "#a09c92", // muted soft
-              }
-            }
-          }
-        }}
-        {...(props as any)}
+        className={cn(
+          "flex h-11 w-full rounded-md border border-hairline bg-surface-card px-4 text-sm text-ink placeholder:text-muted-soft transition-[border-color,box-shadow] duration-200 hover:border-hairline-strong focus:border-hairline-strong focus:outline-none focus:ring-2 focus:ring-primary/10 disabled:cursor-not-allowed disabled:opacity-50",
+          className,
+        )}
+        {...props}
       />
     );
-  }
+  },
 );
+
 Input.displayName = "Input";

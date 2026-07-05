@@ -1,108 +1,73 @@
 "use client";
 
-import { type ReactNode } from "react";
-import { Modal, ROLE } from "baseui/modal";
-import { styled } from "styletron-react";
+import { useEffect, type ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface DialogProps {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
-  className?: string; // Kept for compatibility
+  className?: string;
 }
 
-export function Dialog({ open, onClose, children }: DialogProps) {
+export function Dialog({ open, onClose, children, className }: DialogProps) {
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
   return (
-    <Modal
-      isOpen={open}
-      onClose={onClose}
-      closeable
-      role={ROLE.dialog}
-      animate
-      overrides={{
-        Root: {
-          style: {
-            zIndex: 1000,
-          }
-        },
-        Dialog: {
-          style: ({ $theme }: any) => ({
-            backgroundColor: "#ffffff", // Surface card
-            border: `1px solid ${$theme.colors.borderOpaque || "#e6e5e0"}`, // Hairline border
-            borderRadius: "12px", // {rounded.lg} is 12px
-            padding: "24px",
-            maxWidth: "448px",
-            width: "100%",
-            boxShadow: "none", // Hairline-only depth, no drop shadows
-          })
-        },
-        DialogContainer: {
-          style: {
-            backgroundColor: "rgba(38, 37, 30, 0.15)", // bg-[--color-ink]/15
-            backdropFilter: "blur(4px)",
-          }
-        },
-        Close: {
-          style: {
-            top: "16px",
-            right: "16px",
-            color: "#807d72",
-            ":hover": {
-              color: "#26251e",
-              backgroundColor: "transparent",
-            }
-          }
-        }
-      }}
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/15 backdrop-blur-sm p-4 animate-fade-in"
+      onClick={onClose}
+      role="presentation"
     >
-      {children}
-    </Modal>
+      <div
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
+        className={cn(
+          "relative w-full max-w-md rounded-lg border border-hairline bg-surface-card p-6 animate-scale-in",
+          className,
+        )}
+      >
+        <button
+          onClick={onClose}
+          aria-label="Close dialog"
+          className="absolute right-4 top-4 rounded-sm p-1 text-muted transition-colors hover:text-ink cursor-pointer"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        {children}
+      </div>
+    </div>
   );
 }
 
-const StyledDialogHeader = styled("div", {
-  marginBottom: "20px",
-  display: "flex",
-  flexDirection: "column",
-  gap: "4px",
-});
-
 export function DialogHeader({ children, className }: { children: ReactNode; className?: string }) {
-  return <StyledDialogHeader className={className}>{children}</StyledDialogHeader>;
+  return <div className={cn("mb-5 flex flex-col gap-1 pr-8", className)}>{children}</div>;
 }
-
-const StyledTitle = styled("h2", ({ $theme }: any) => ({
-  fontSize: "22px", // {typography.display-sm} is 22px
-  fontWeight: "400", // Display weight stays at 400. Magazine voice.
-  lineHeight: "1.3",
-  letterSpacing: "-0.11px",
-  margin: 0,
-  color: $theme.colors.contentPrimary || "#26251e",
-}));
 
 export function DialogTitle({ children, className }: { children: ReactNode; className?: string }) {
-  return <StyledTitle className={className}>{children}</StyledTitle>;
+  return <h2 className={cn("text-display-sm", className)}>{children}</h2>;
 }
-
-const StyledDescription = styled("p", ({ $theme }: any) => ({
-  fontSize: "14px",
-  lineHeight: "1.5",
-  margin: 0,
-  color: $theme.colors.contentTertiary || "#807d72",
-}));
 
 export function DialogDescription({ children, className }: { children: ReactNode; className?: string }) {
-  return <StyledDescription className={className}>{children}</StyledDescription>;
+  return <p className={cn("text-sm text-muted", className)}>{children}</p>;
 }
 
-const StyledFooter = styled("div", {
-  marginTop: "24px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  gap: "12px",
-});
-
 export function DialogFooter({ children, className }: { children: ReactNode; className?: string }) {
-  return <StyledFooter className={className}>{children}</StyledFooter>;
+  return <div className={cn("mt-6 flex items-center justify-end gap-3", className)}>{children}</div>;
 }

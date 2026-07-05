@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "@/lib/auth-context";
 import { ToastProvider } from "@/components/ui/toast";
-import { StyletronProviderWrapper } from "@/lib/styletron-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,11 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <StyletronProviderWrapper>
-          <AuthProvider>
-            <ToastProvider>{children}</ToastProvider>
-          </AuthProvider>
-        </StyletronProviderWrapper>
+        <AuthProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </AuthProvider>
       </body>
     </html>
   );

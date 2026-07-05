@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { isAxiosError } from "axios";
 import { Dialog, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,8 +29,10 @@ export function JoinEventDialog({ open, onClose, onJoined }: JoinEventDialogProp
       const result = await joinEvent(code.trim());
       setCode("");
       onJoined(result.eventId);
-    } catch (e: any) {
-      const msg = e.response?.data?.message || "Failed to join event. Check the code.";
+    } catch (e) {
+      const msg =
+        (isAxiosError(e) && e.response?.data?.message) ||
+        "Failed to join event. Check the code.";
       setError(msg);
       toast(msg, "error");
     } finally {
@@ -56,7 +59,7 @@ export function JoinEventDialog({ open, onClose, onJoined }: JoinEventDialogProp
             disabled={joining}
             className="font-mono text-lg tracking-[0.25em] text-center"
           />
-          {error && <p className="text-xs text-[--color-error]">{error}</p>}
+          {error && <p className="text-xs text-error">{error}</p>}
         </div>
       </div>
 

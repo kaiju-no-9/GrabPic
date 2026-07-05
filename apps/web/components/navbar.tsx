@@ -38,11 +38,11 @@ export function Navbar({
   };
 
   return (
-    <nav className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-[--color-hairline] bg-[--color-canvas] px-6">
+    <nav className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-hairline bg-canvas px-6">
       <div className="flex items-center gap-4">
         {showSettings && isLoggedIn && (
           <Link href="/dashboard" aria-label="Go to Dashboard">
-            <Button variant="ghost" size="icon" className="text-[--color-body] hover:text-[--color-ink]">
+            <Button variant="ghost" size="icon" className="text-body hover:text-ink">
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -50,17 +50,17 @@ export function Navbar({
             </Button>
           </Link>
         )}
-        <Link href="/" className="text-[18px] font-semibold tracking-tight text-[--color-ink] font-mono">
+        <Link href="/" className="text-[18px] font-semibold tracking-tight text-ink font-mono">
           GrabPic
         </Link>
       </div>
 
       {eventCode && (
-        <div className="flex items-center gap-2 rounded-[--radius-sm] border border-[--color-hairline] bg-[--color-canvas-soft] px-3 py-1 text-sm font-mono text-[--color-ink]">
+        <div className="flex items-center gap-2 rounded-sm border border-hairline bg-canvas-soft px-3 py-1 text-sm font-mono text-ink">
           <span>{eventCode}</span>
           <button
             onClick={handleCopyCode}
-            className="text-[--color-muted] hover:text-[--color-ink] transition-colors"
+            className="text-muted hover:text-ink transition-colors"
             title="Copy code"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

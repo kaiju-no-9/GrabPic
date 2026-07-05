@@ -82,12 +82,12 @@ export function PhotoLightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col justify-between bg-[--color-ink]/98 p-6 animate-fade-in text-[--color-canvas]"
+      className="fixed inset-0 z-50 flex flex-col justify-between bg-ink/98 p-6 animate-fade-in text-canvas"
       onClick={onClose}
     >
       {/* Top Header Controls */}
       <div className="flex items-center justify-between w-full p-2 z-10 border-b border-white/5 pb-4">
-        <span className="text-xs font-mono text-[--color-muted-soft] select-none">
+        <span className="text-xs font-mono text-muted-soft select-none">
           {currentIndex + 1} <span className="text-white/20">/</span> {photos.length}
         </span>
         <div className="flex items-center gap-4">
@@ -101,7 +101,7 @@ export function PhotoLightbox({
           </Button>
           <button
             onClick={onClose}
-            className="p-1 rounded-[--radius-sm] text-white/60 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+            className="p-1 rounded-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
             aria-label="Close lightbox"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -120,7 +120,7 @@ export function PhotoLightbox({
               e.stopPropagation();
               handlePrev();
             }}
-            className="absolute left-0 p-3 rounded-[--radius-md] bg-white/5 border border-white/10 hover:bg-white/10 text-white/80 hover:text-white transition-colors z-10 cursor-pointer"
+            className="absolute left-0 p-3 rounded-md bg-white/5 border border-white/10 hover:bg-white/10 text-white/80 hover:text-white transition-colors z-10 cursor-pointer"
             aria-label="Previous photo"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -131,13 +131,14 @@ export function PhotoLightbox({
 
         {/* The Frame */}
         <div 
-          className="relative max-w-full max-h-[75vh] flex items-center justify-center p-2 rounded-[--radius-lg] border border-white/5 bg-black/20"
+          className="relative max-w-full max-h-[75vh] flex items-center justify-center p-2 rounded-lg border border-white/5 bg-black/20"
           onClick={(e) => e.stopPropagation()}
         >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={currentPhoto.url}
             alt=""
-            className="max-w-full max-h-[70vh] object-contain select-none rounded-[--radius-md] border border-white/5 animate-scale-in"
+            className="max-w-full max-h-[70vh] object-contain select-none rounded-md border border-white/5 animate-scale-in"
           />
         </div>
 
@@ -148,7 +149,7 @@ export function PhotoLightbox({
               e.stopPropagation();
               handleNext();
             }}
-            className="absolute right-0 p-3 rounded-[--radius-md] bg-white/5 border border-white/10 hover:bg-white/10 text-white/80 hover:text-white transition-colors z-10 cursor-pointer"
+            className="absolute right-0 p-3 rounded-md bg-white/5 border border-white/10 hover:bg-white/10 text-white/80 hover:text-white transition-colors z-10 cursor-pointer"
             aria-label="Next photo"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

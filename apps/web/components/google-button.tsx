@@ -7,7 +7,7 @@ export function GoogleButton() {
     <a
       href={`${API_URL}/api/auth/google`}
       className={cn(
-        "inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-[--radius-md] border border-[--color-hairline-strong] bg-[--color-surface-card] text-[--color-ink] px-8 py-2.5 text-[14px] font-medium transition-colors hover:border-[--color-ink]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-primary]/40",
+        "inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-md border border-hairline-strong bg-surface-card text-ink px-8 py-2.5 text-[14px] font-medium transition-colors hover:border-ink/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
         "h-10 w-full"
       )}
     >
