@@ -48,32 +48,14 @@
   --radius-xl: 16px;
   --radius-pill: 9999px;
 
-  /* ── Spacing ── */
-  --spacing-xxs: 4px;
-  --spacing-xs: 8px;
-  --spacing-sm: 12px;
-  --spacing-base: 16px;
-  --spacing-md: 20px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-xxl: 48px;
-  --spacing-section: 80px;
-
   /* ── Font Families ── */
   --font-sans: "Inter", system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", "Fira Code", monospace;
 }
-/* ── Base Reset ── */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html,
-body {
+/* ── Base Styles ── */
+@layer base {
+  html,
+  body {
   max-width: 100vw;
   min-height: 100vh;
   overflow-x: hidden;
@@ -82,13 +64,14 @@ body {
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 /* ── Keyframe Animations ── */
